@@ -4,6 +4,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifndef BIGINT_ASSERT
+#include <assert.h>
+#define BIGINT_ASSERT assert
+#endif // BIGINT_ASSERT
+
 typedef struct {
     char* digits;
     size_t length;
@@ -33,7 +38,6 @@ void bigint_print(const bigint *num);
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include <ctype.h>
 
 bigint bigint_new(char* value) {
