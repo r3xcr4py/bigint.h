@@ -12,10 +12,10 @@ int main(void) {
     bigint n = bigint_new("10");
 
     bigint_pow(&number, &n);
-    bigint_print(&number) // 1024
+    bigint_print(&number); // 1024
 
     bigint_add(&number, &n);
-    bigint_print(&number) // 1034
+    bigint_print(&number); // 1034
 
     bigint_free(&number);
     bigint_free(&n);
