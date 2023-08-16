@@ -52,7 +52,7 @@ bigint bigint_new(char* value) {
     number.length = value_len; 
     number.digits = malloc(number.length * sizeof(char));
     if (number.digits == NULL) {
-        assert(0 && "Can't allocate memory");
+        BIGINT_ASSERT(0 && "Can't allocate memory");
     }
     for (size_t i = 0; i < number.length; i++) {
         number.digits[i] = value[number.length-1-i]-'0'; 
@@ -73,7 +73,7 @@ void bigint_realloc(bigint *num, size_t length) {
     num->digits = realloc(num->digits, length * sizeof(char)); 
     num->length = length;
     if (num->digits == NULL) {
-        assert(0 && "Can't allocate memory");
+        BIGINT_ASSERT(0 && "Can't allocate memory");
     }
     if (num->length > old_len) {
         for (size_t i = 0; i < old_len; i++) {
@@ -93,7 +93,7 @@ bigint bigint_clone(const bigint *num) {
     new.length = num->length; 
     new.digits = malloc(new.length * sizeof(char));
     if (new.digits == NULL) {
-        assert(0 && "Can't allocate memory");
+        BIGINT_ASSERT(0 && "Can't allocate memory");
     }
 
     for (size_t i = 0; i < num->length; i++) {
@@ -190,7 +190,7 @@ void bigint_add(bigint *a, const bigint *b) {
  * Subtraction by addition: https://www.mathsisfun.com/numbers/subtraction-by-addition.html
  */
 void bigint_sub(bigint *a, const bigint *b) {
-    assert(bigint_ge(a, b) && "Negative numbers are not supported yet");
+    BIGINT_ASSERT(bigint_ge(a, b) && "Negative numbers are not supported yet");
 
     if (bigint_eq(a, b)) {
         bigint_free(a);
