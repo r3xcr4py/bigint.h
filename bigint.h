@@ -50,7 +50,7 @@ bigint bigint_new(char* value) {
 
     bigint number;
     number.length = value_len; 
-    number.digits = malloc(number.length * sizeof(char));
+    number.digits = (char*) malloc(number.length * sizeof(char));
     if (number.digits == NULL) {
         BIGINT_ASSERT(0 && "Can't allocate memory");
     }
@@ -62,15 +62,19 @@ bigint bigint_new(char* value) {
 
 void bigint_realloc(bigint *num, size_t length) {
     if (num->length == length) return;
+    if (length == 0) {
+        bigint_free(num);
+        return;
+    }
 
-    char* tmp = malloc(sizeof(char) * num->length);
+    char* tmp = (char*) malloc(sizeof(char) * num->length);
     for (size_t i = 0; i < num->length; i++) {
         tmp[i] = num->digits[i];
     }
     
     size_t old_len = num->length;
 
-    num->digits = realloc(num->digits, length * sizeof(char)); 
+    num->digits = (char*) realloc(num->digits, length * sizeof(char)); 
     num->length = length;
     if (num->digits == NULL) {
         BIGINT_ASSERT(0 && "Can't allocate memory");
@@ -89,23 +93,24 @@ void bigint_realloc(bigint *num, size_t length) {
 }
 
 bigint bigint_clone(const bigint *num) {
-    bigint new;
-    new.length = num->length; 
-    new.digits = malloc(new.length * sizeof(char));
-    if (new.digits == NULL) {
+    bigint cloned;
+    cloned.length = num->length; 
+    cloned.digits = (char*) malloc(cloned.length * sizeof(char));
+    if (cloned.digits == NULL) {
         BIGINT_ASSERT(0 && "Can't allocate memory");
     }
 
     for (size_t i = 0; i < num->length; i++) {
-        new.digits[i] = num->digits[i];
+        cloned.digits[i] = num->digits[i];
     }
 
-    return new;
+    return cloned;
 }
 
 void bigint_free(bigint *num) {
     num->length = 0;
     free(num->digits);
+    num->digits = NULL;
 }
 
 void bigint_print(const bigint *num) {
@@ -116,6 +121,10 @@ void bigint_print(const bigint *num) {
 }
 
 bool bigint_eq(const bigint *a, const bigint *b) {
+    if (a->length == 0 || b->length == 0 || a->digits == NULL || b->digits == NULL) {
+        return false;
+    }
+
     size_t a_end, b_end, i;
     
     i = a->length;
@@ -137,6 +146,10 @@ bool bigint_eq(const bigint *a, const bigint *b) {
 }
 
 bool bigint_gt(const bigint *a, const bigint *b) {
+    if (a->length == 0 || b->length == 0 || a->digits == NULL || b->digits == NULL) {
+        return false;
+    }
+
     size_t a_end, b_end, i;
     
     i = a->length;
@@ -214,6 +227,13 @@ void bigint_sub(bigint *a, const bigint *b) {
         }
     }
 
+    bigint zero = bigint_new("0");
+    if (bigint_eq(&b_complement, &zero)) {
+        bigint_free(&b_complement);
+        b_complement = bigint_new("10");
+    }
+    bigint_free(&zero);
+
     // we need to pad 'b_complement' to become the same length as 'a'
     if (b_complement.length < a->length) {
         int old_len = b_complement.length;
@@ -226,6 +246,8 @@ void bigint_sub(bigint *a, const bigint *b) {
     bigint_add(a, &b_complement);
     a->digits[a->length-1] = 0;
     a->length--;
+
+    bigint_free(&b_complement);
 
     // remove leading zeros
     size_t i = a->length;
