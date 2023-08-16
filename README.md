@@ -25,6 +25,7 @@ int main(void) {
 ```
 
 ### Tests
+Requirements: CUnit
 ```shell
 ./test.sh
 ```
