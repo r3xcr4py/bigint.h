@@ -263,6 +263,8 @@ void bigint_mul(bigint *a, const bigint *b) {
         *a = bigint_new("0");
         bigint_free(&zero);
         return;
+    } else if (bigint_eq(a, &zero)) {
+        return;
     }
     bigint_free(&zero);
 
